@@ -88,11 +88,18 @@ def app():
     # Create sliders in the sidebar
     log_scale                   = st.sidebar.toggle('Log scale', value=True)
     st.sidebar.latex(r"\text{Main radius } (R_1): " + f"{main_radius:.1e} \ m")
-    MZ_ratio                    = st.sidebar.slider('MZ length ratio (MZ / R_1)', min_value=0., max_value=10., value=1., step=0.05)
-    auxiliary_radius_ratio      = st.sidebar.slider('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, max_value=2., value=1., step=0.01)
-    main_cross_coupling         = st.sidebar.slider('Main cross coupling ()', min_value=0., max_value=1., value=0.1, step=0.01)
-    auxiliary_cross_coupling    = st.sidebar.slider('Auxiliary cross coupling', min_value=0., max_value=1., value=0., step=0.01)
-    n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5)
+    # with st.sidebar.expander('Sliders'):
+    #     MZ_ratio                    = st.slider('MZ length ratio (MZ / R_1)', min_value=0., max_value=10., value=1., step=0.05)
+    #     auxiliary_radius_ratio      = st.slider('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, max_value=2., value=1., step=0.01)
+    #     main_cross_coupling         = st.slider('Main cross coupling ()', min_value=0., max_value=1., value=0.1, step=0.01)
+    #     auxiliary_cross_coupling    = st.slider('Auxiliary cross coupling', min_value=0., max_value=1., value=0., step=0.01)
+
+    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / R_1)', min_value=0., value=1., format='%f')
+    auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%f')
+    main_cross_coupling         = st.sidebar.number_input('Main cross coupling ()', min_value=0., max_value=1., value=0.1, format='%f')
+    auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling', min_value=0., max_value=1., value=0., format='%f')
+    n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5, format='%f')
+    
 
     fig = interactive_plot(MZ_ratio, auxiliary_radius_ratio, main_cross_coupling, auxiliary_cross_coupling, log_scale, n_res_left, n_res_right)
 
