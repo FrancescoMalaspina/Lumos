@@ -1,7 +1,6 @@
 from .base import BaseStructure, CompositeStructure, Pin, wavelength_to_frequency
 from collections.abc import Sequence
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.constants import c
 
 
@@ -172,28 +171,6 @@ class RingResonator(CompositeStructure):
         """ Return a string representation of the Pin object. """
         return f"RingResonator {self.id}"
 
-    def plot_spectrum(self):
-        plt.figure(figsize=(12, 7))
-        plt.plot(self.angular_frequencies, self.transmission, label="simulated", linewidth=1)
-
-        # theoretical curve
-        omega_0 = wavelength_to_frequency(self.central_wavelength)
-        phase = self.wavevector * self.radius * 2 * np.pi
-        sigma = np.sqrt((1 - np.power(self.cross_coupling_coefficient, 2)))
-        loss = np.exp(-self.loss_dB * np.log(10) / 20 * self.radius * 2 * np.pi)
-        teo_transmission = (sigma ** 2 + loss ** 2 - 2 * sigma * loss * np.cos(phase)) / (
-                    1 + (sigma * loss) ** 2 - 2 * sigma * loss * np.cos(phase))
-        plt.plot(self.angular_frequencies, teo_transmission, label="theorical", linestyle=":", linewidth=3)
-        plt.vlines(omega_0, 0, 1, label="omega_0", linestyle="--", linewidth=2, color="grey")
-
-        plt.xlabel("Angular frequency [s-1]")
-        plt.ylabel("Transmission")
-        plt.title("Transmission spectrum")
-        # plt.yscale("log")
-        plt.legend()
-        plt.grid()
-        plt.show()
-
 
 class AddDropFilter(CompositeStructure):
     num_pins = 8
@@ -253,73 +230,3 @@ class AddDropFilter(CompositeStructure):
     @property
     def transmission(self):
         return np.power(np.abs(self.fields[:, 6]), 2)
-
-    def plot_spectrum(self):
-        plt.figure(figsize=(12, 7))
-        plt.plot(self.angular_frequencies, self.transmission, label="simulated", linewidth=1)
-
-        # theoretical curve
-        omega_0 = wavelength_to_frequency(self.central_wavelength)
-        phase = self.wavevector * 2 * self.radius * np.pi
-        sigma = np.sqrt((1 - np.power(self.input_cross_coupling_coefficient, 2)))
-        sigma_aux = np.sqrt((1 - np.power(self.auxiliary_cross_coupling_coefficient, 2)))
-        loss = np.exp(-self.loss_dB * np.log(10) / 20 * self.radius * 2 * np.pi)
-        teo_transmission = (self.input_cross_coupling_coefficient * self.auxiliary_cross_coupling_coefficient) ** 2 \
-                           / (1 + (sigma * sigma_aux * loss) ** 2 - 2 * sigma * sigma_aux * loss * np.cos(phase))
-        plt.plot(self.angular_frequencies, teo_transmission, label="theorical", linestyle=":", linewidth=3)
-        plt.vlines(omega_0, 0, 1, label="omega_0", linestyle="--", linewidth=2, color="grey")
-        plt.xlabel("Angular frequency [s-1]")
-        plt.ylabel("Transmission")
-        # plt.ylabel("Field enhancement")
-        plt.title("Transmission spectrum")
-        # plt.yscale("log")
-        plt.legend()
-        plt.grid()
-        plt.show()
-
-
-def ring_degub():
-    omega_0 = wavelength_to_frequency(1550e-9)
-    omega_m = c / 120e-6
-    angular_frequencies = np.linspace(omega_0 - 1.5 * omega_m, omega_0 + 1.5 * omega_m, 50000)
-    ring = RingResonator(
-        radius=120e-6,
-        cross_coupling_coefficient=1e-1,
-        effective_refractive_index=1.7,
-        group_refractive_index=2,
-        GVD=0.6e-24,
-        loss_dB=10,
-        central_wavelength=1550e-9,
-        angular_frequencies=angular_frequencies,
-    )
-    ring.structures.append(Source(pins=[ring.pins[0]]))
-    ring.plot_spectrum()
-
-
-def add_drop_filter_debug():
-    omega_0 = wavelength_to_frequency(1550e-9)
-    omega_m = c / 120e-6
-    angular_frequencies = np.linspace(omega_0 - 1.5 * omega_m, omega_0 + 1.5 * omega_m, 50000)
-    filter = AddDropFilter(
-        radius=120e-6,
-        input_cross_coupling_coefficient=1e-1,
-        auxiliary_cross_coupling_coefficient=1e-1,
-        effective_refractive_index=1.7,
-        group_refractive_index=2,
-        GVD=0.6e-24,
-        loss_dB=10,
-        central_wavelength=1550e-9,
-        angular_frequencies=angular_frequencies,
-    )
-    filter.structures.append(Source(pins=[filter.pins[0]]))
-    filter.structures.append(Source(amplitude=0, pins=[filter.pins[4]]))
-    # print(len(filter.field_equations))
-    # print(filter.coefficient_matrix)
-    # print(filter.ordinate_vector)
-    filter.plot_spectrum()
-
-
-if __name__ == "__main__":
-    ring_degub()
-    # add_drop_filter_debug()
-    # ring_interferometer_debug()
