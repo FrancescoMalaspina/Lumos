@@ -75,7 +75,8 @@ def interactive_plot(
         central_wavelength = central_wavelength,
         angular_frequencies = angular_frequencies,
     )
-    # plot
+
+    # field modolus
     modulus_fig = go.Figure(
         layout=dict(
             width=2400,  # Width in pixels
@@ -91,6 +92,7 @@ def interactive_plot(
     if log_scale:
         modulus_fig.update_layout(yaxis_type="log")
 
+    # field phase
     phase_fig = go.Figure(
         layout=dict(
             width=2400,  # Width in pixels
@@ -99,9 +101,21 @@ def interactive_plot(
     )
     phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(reference_fields[:, pin]), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
     phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(new_fields[:, pin]), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
-    # phase_fig.update_layout(title=f'Field phase @ pin {pin}',  xaxis_title='Angular frequency [rad/s]', yaxis_title='Phase [rad]', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
     phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Phase [rad]', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
-    return modulus_fig, phase_fig
+
+    # field intensity
+    intensity_fig = go.Figure(
+        layout=dict(
+            width=2400,  # Width in pixels
+            height=1350  # Height in pixels
+        )
+    )
+    intensity_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(reference_fields[:, pin])**2, mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
+    intensity_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(new_fields[:, pin])**2, mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
+    intensity_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Intensity enhancement', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
+    if log_scale:
+        intensity_fig.update_layout(yaxis_type="log")
+    return modulus_fig, phase_fig, intensity_fig
 
 
 # Streamlit app
@@ -112,12 +126,6 @@ def app():
     # input widgets
     log_scale                   = st.sidebar.toggle('Log scale', value=True)
     st.sidebar.latex(r"\text{Main radius } (R_1): " + f"{main_radius:.1e} \ m")
-    # with st.sidebar.expander('Sliders'):
-    #     MZ_ratio                    = st.slider('MZ length ratio (MZ / R_1)', min_value=0., max_value=10., value=1., step=0.05)
-    #     auxiliary_radius_ratio      = st.slider('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, max_value=2., value=1., step=0.01)
-    #     main_cross_coupling         = st.slider('Main cross coupling ()', min_value=0., max_value=1., value=0.1, step=0.01)
-    #     auxiliary_cross_coupling    = st.slider('Auxiliary cross coupling', min_value=0., max_value=1., value=0., step=0.01)
-
     MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%.4f')
     auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%.4f')
     input_cross_coupling        = st.sidebar.number_input('Input cross coupling (κ_0)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
@@ -126,7 +134,8 @@ def app():
     n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5, format='%f')
     pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
-    modulus_fig, phase_fig = interactive_plot(
+    # Build the interactive plots
+    modulus_fig, phase_fig, intensity_fig = interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
         input_cross_coupling, 
@@ -139,13 +148,13 @@ def app():
     )
 
 
-    # Display the plot
+    # Display the plots
     with st.expander(f'**Field enhancement @ pin {pin}**', expanded=True):
         st.plotly_chart(modulus_fig, use_container_width=True)
-
+    with st.expander(f'**Intensity enhancement @ pin {pin}**', expanded=False):
+        st.plotly_chart(intensity_fig, use_container_width=True)
     with st.expander(f'**Field phase @ pin {pin}**', expanded=True):
         st.plotly_chart(phase_fig, use_container_width=True)
-
     diagram = 'img/tikz.png'
     with st.expander('**Structure diagram**', expanded=True):
         cols = st.columns([1, 1, 1])
