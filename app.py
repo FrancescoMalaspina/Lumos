@@ -108,8 +108,8 @@ def app():
     # col1.markdown('<br>', unsafe_allow_html=True)  # Adjust the number of <br> tags as needed
     # col1.markdown(r'MZ length ratio ($\frac{MZ}{\pi \times R_1}$)')
     # MZ_ratio = col2.number_input('', min_value=0., value=1., format='%f')
-    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%f')
-    auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%f')
+    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%.6f')
+    auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%.6f')
     input_cross_coupling        = st.sidebar.number_input('Input cross coupling (κ_0)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
     through_cross_coupling      = st.sidebar.number_input('Through cross coupling (κ_4)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
     auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling (κ_8)', min_value=0., max_value=1., value=0., step=0.1, format='%.2f')
