@@ -36,6 +36,7 @@ def interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
         new_main_cross_coupling, 
+        new_trough_cross_coupling,
         new_auxiliary_cross_coupling, 
         log_scale, 
         n_res_left, 
@@ -64,15 +65,15 @@ def interactive_plot(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius_ratio * main_radius,
         mach_zender_length = MZ_ratio * main_radius * np.pi,
-        input_cross_coupling_coefficient=new_main_cross_coupling,
-        through_cross_coupling_coefficient=new_main_cross_coupling,
-        ring_cross_coupling_coefficient= new_auxiliary_cross_coupling,
-        effective_refractive_index=effective_index,
-        group_refractive_index=group_index,
-        GVD=GVD,
-        loss_dB=loss_dB,
-        central_wavelength=central_wavelength,
-        angular_frequencies=angular_frequencies,
+        input_cross_coupling_coefficient = new_main_cross_coupling,
+        through_cross_coupling_coefficient = new_trough_cross_coupling,
+        ring_cross_coupling_coefficient = new_auxiliary_cross_coupling,
+        effective_refractive_index = effective_index,
+        group_refractive_index = group_index,
+        GVD = GVD,
+        loss_dB = loss_dB,
+        central_wavelength = central_wavelength,
+        angular_frequencies = angular_frequencies,
     )
     # plot
     fig = go.Figure(
@@ -103,17 +104,23 @@ def app():
     #     main_cross_coupling         = st.slider('Main cross coupling ()', min_value=0., max_value=1., value=0.1, step=0.01)
     #     auxiliary_cross_coupling    = st.slider('Auxiliary cross coupling', min_value=0., max_value=1., value=0., step=0.01)
 
+    # col1, col2 = st.sidebar.columns([1,1])
+    # col1.markdown('<br>', unsafe_allow_html=True)  # Adjust the number of <br> tags as needed
+    # col1.markdown(r'MZ length ratio ($\frac{MZ}{\pi \times R_1}$)')
+    # MZ_ratio = col2.number_input('', min_value=0., value=1., format='%f')
     MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%f')
     auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%f')
-    main_cross_coupling         = st.sidebar.number_input('Main cross coupling ()', min_value=0., max_value=1., value=0.1, format='%f')
-    auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling', min_value=0., max_value=1., value=0., format='%f')
+    input_cross_coupling        = st.sidebar.number_input('Input cross coupling (κ_0)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
+    through_cross_coupling      = st.sidebar.number_input('Through cross coupling (κ_4)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
+    auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling (κ_8)', min_value=0., max_value=1., value=0., step=0.1, format='%.2f')
     n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5, format='%f')
-    pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
+    pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
     fig = interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
-        main_cross_coupling, 
+        input_cross_coupling, 
+        through_cross_coupling,
         auxiliary_cross_coupling, 
         log_scale, 
         n_res_left, 
