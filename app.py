@@ -32,7 +32,16 @@ pin = 1 # TODO: make the pin choice an integer slider or something similar
 
 
 # interactive plot with plotly
-def interactive_plot(MZ_ratio, auxiliary_radius_ratio, new_main_cross_coupling, new_auxiliary_cross_coupling, log_scale, n_res_left, n_res_right): 
+def interactive_plot(
+        MZ_ratio, 
+        auxiliary_radius_ratio, 
+        new_main_cross_coupling, 
+        new_auxiliary_cross_coupling, 
+        log_scale, 
+        n_res_left, 
+        n_res_right, 
+        pin
+    ): 
     angular_frequencies = np.linspace(omega_0 + n_res_left/2*omega_m, omega_0 + n_res_right/2*omega_m, number_of_points)
     # objects
     Pin.reset_id_iterator()
@@ -85,7 +94,7 @@ def app():
     st.set_page_config(layout='wide')
     st.title('Headless Snowman')
 
-    # Create sliders in the sidebar
+    # input widgets
     log_scale                   = st.sidebar.toggle('Log scale', value=True)
     st.sidebar.latex(r"\text{Main radius } (R_1): " + f"{main_radius:.1e} \ m")
     # with st.sidebar.expander('Sliders'):
@@ -94,17 +103,30 @@ def app():
     #     main_cross_coupling         = st.slider('Main cross coupling ()', min_value=0., max_value=1., value=0.1, step=0.01)
     #     auxiliary_cross_coupling    = st.slider('Auxiliary cross coupling', min_value=0., max_value=1., value=0., step=0.01)
 
-    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / R_1)', min_value=0., value=1., format='%f')
+    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%f')
     auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%f')
     main_cross_coupling         = st.sidebar.number_input('Main cross coupling ()', min_value=0., max_value=1., value=0.1, format='%f')
     auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling', min_value=0., max_value=1., value=0., format='%f')
     n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5, format='%f')
-    
+    pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
-    fig = interactive_plot(MZ_ratio, auxiliary_radius_ratio, main_cross_coupling, auxiliary_cross_coupling, log_scale, n_res_left, n_res_right)
+    fig = interactive_plot(
+        MZ_ratio, 
+        auxiliary_radius_ratio, 
+        main_cross_coupling, 
+        auxiliary_cross_coupling, 
+        log_scale, 
+        n_res_left, 
+        n_res_right, 
+        pin
+    )
 
     # Display the plot
     st.plotly_chart(fig, use_container_width=True)
+
+    diagram = 'img/tikz.png'
+    st.image(diagram, width=500)
+
 
 # Run the app
 if __name__ == '__main__':
