@@ -27,8 +27,7 @@ omega_0 = wavelength_to_frequency(1550e-9)
 omega_m = c / auxiliary_radius / group_index
 n_res = 5
 angular_frequencies = np.linspace(omega_0 - n_res/2*omega_m, omega_0 + n_res/2*omega_m, number_of_points)
-
-pin = 1 # TODO: make the pin choice an integer slider or something similar
+pin = 1
 
 
 # interactive plot with plotly
@@ -76,7 +75,7 @@ def interactive_plot(
         angular_frequencies = angular_frequencies,
     )
 
-    # field modolus
+    # field modulus
     modulus_fig = go.Figure(
         layout=dict(
             width=2400,  # Width in pixels
@@ -99,9 +98,10 @@ def interactive_plot(
             height=1350  # Height in pixels
         )
     )
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(reference_fields[:, pin]), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(new_fields[:, pin]), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
+    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(reference_fields[:, pin]), mode='markers', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
+    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(new_fields[:, pin]), mode='markers', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
     phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Phase [rad]', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
+    phase_fig.update_xaxes(range=[angular_frequencies[0], angular_frequencies[-1]])
 
     # field intensity
     intensity_fig = go.Figure(
