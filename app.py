@@ -22,7 +22,7 @@ GVD = 0.6e-24
 loss_dB = 10 # 10 dB/m
 
 # simulation parameters
-number_of_points = 20000
+number_of_points = 5000
 omega_0 = wavelength_to_frequency(1550e-9)
 omega_m = c / main_radius / group_index
 n_res = 5
