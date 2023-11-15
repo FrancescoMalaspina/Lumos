@@ -22,9 +22,9 @@ GVD = 0.6e-24
 loss_dB = 10 # 10 dB/m
 
 # simulation parameters
-number_of_points = 10000
+number_of_points = 20000
 omega_0 = wavelength_to_frequency(1550e-9)
-omega_m = c / auxiliary_radius / group_index
+omega_m = c / main_radius / group_index
 n_res = 5
 angular_frequencies = np.linspace(omega_0 - n_res/2*omega_m, omega_0 + n_res/2*omega_m, number_of_points)
 pin = 1
@@ -42,7 +42,7 @@ def interactive_plot(
         n_res_right, 
         pin
     ): 
-    angular_frequencies = np.linspace(omega_0 + n_res_left/2*omega_m, omega_0 + n_res_right/2*omega_m, number_of_points)
+    angular_frequencies = np.linspace(omega_0 + n_res_left*omega_m, omega_0 + n_res_right*omega_m, number_of_points)
     # objects
     Pin.reset_id_iterator()
     standard_HS = HeadlessSnowman(
@@ -76,12 +76,7 @@ def interactive_plot(
     )
 
     # field modulus
-    modulus_fig = go.Figure(
-        layout=dict(
-            width=2400,  # Width in pixels
-            height=1350  # Height in pixels
-        )
-    )
+    modulus_fig = go.Figure()
     reference_fields = standard_HS.fields
     new_fields = new_HS.fields
     modulus_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(reference_fields[:, pin]), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
@@ -92,30 +87,29 @@ def interactive_plot(
         modulus_fig.update_layout(yaxis_type="log")
 
     # field phase
-    phase_fig = go.Figure(
-        layout=dict(
-            width=2400,  # Width in pixels
-            height=1350  # Height in pixels
-        )
-    )
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(reference_fields[:, pin]), mode='markers', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.angle(new_fields[:, pin]), mode='markers', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
-    phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Phase [rad]', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
+    phase_fig = go.Figure()
+    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(np.angle(reference_fields[:, pin])), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
+    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(np.angle(new_fields[:, pin])), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
+    phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='cos( Phase [rad] )', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
     phase_fig.update_xaxes(range=[angular_frequencies[0], angular_frequencies[-1]])
 
+    # MZ phase difference
+    ref_delta_phi_mz = (np.angle(reference_fields[:, 4]) - np.angle(reference_fields[:, 2])) - (np.angle(reference_fields[:, 5]) - np.angle(reference_fields[:, 3]))
+    new_delta_phi_mz = (np.angle(new_fields[:, 4]) - np.angle(new_fields[:, 2])) - (np.angle(new_fields[:, 5]) - np.angle(new_fields[:, 3]))
+    mz_phase_fig = go.Figure()
+    mz_phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(ref_delta_phi_mz), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
+    mz_phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(new_delta_phi_mz), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
+    mz_phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='cos( Phase [rad] )', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
+    mz_phase_fig.update_xaxes(range=[angular_frequencies[0], angular_frequencies[-1]])
+
     # field intensity
-    intensity_fig = go.Figure(
-        layout=dict(
-            width=2400,  # Width in pixels
-            height=1350  # Height in pixels
-        )
-    )
+    intensity_fig = go.Figure()
     intensity_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(reference_fields[:, pin])**2, mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
     intensity_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(new_fields[:, pin])**2, mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
     intensity_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Intensity enhancement', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
     if log_scale:
         intensity_fig.update_layout(yaxis_type="log")
-    return modulus_fig, phase_fig, intensity_fig
+    return modulus_fig, phase_fig, intensity_fig, mz_phase_fig
 
 
 # Streamlit app
@@ -124,18 +118,18 @@ def app():
     st.title('Headless Snowman')
 
     # input widgets
-    log_scale                   = st.sidebar.toggle('Log scale', value=True)
+    log_scale                   = st.sidebar.toggle('Log scale', value=False)
     st.sidebar.latex(r"\text{Main radius } (R_1): " + f"{main_radius:.1e} \ m")
-    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)', min_value=0., value=1., format='%.4f')
-    auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01, value=1., format='%.4f')
-    input_cross_coupling        = st.sidebar.number_input('Input cross coupling (κ_0)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
-    through_cross_coupling      = st.sidebar.number_input('Through cross coupling (κ_4)', min_value=0., max_value=1., value=0.1, step=0.1, format='%.2f')
-    auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling (κ_8)', min_value=0., max_value=1., value=0., step=0.1, format='%.2f')
-    n_res_left, n_res_right     = st.sidebar.slider('X axis range [number of resonances]', min_value=-20., max_value=20., value=(-3., +3.), step=0.5, format='%f')
+    MZ_ratio                    = st.sidebar.number_input('MZ length ratio (MZ / pi * R_1)',    min_value=0.01,                 value=1.,           step=1e-6,  format='%.6f')
+    auxiliary_radius_ratio      = st.sidebar.number_input('Auxiliary radius ratio (R_2 / R_1)', min_value=0.01,                 value=0.1,           step=1e-6,  format='%.6f')
+    input_cross_coupling        = st.sidebar.number_input('Input cross coupling (κ_0)',         min_value=0.,   max_value=1.,   value=0.2,          step=0.05,  format='%.2f')
+    through_cross_coupling      = st.sidebar.number_input('Through cross coupling (κ_4)',       min_value=0.,   max_value=1.,   value=0.1,          step=0.05,  format='%.2f')
+    auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling (κ_8)',     min_value=0.,   max_value=1.,   value=0.5,          step=0.05,  format='%.2f')
+    n_res_left, n_res_right     = st.sidebar.slider('X axis range [FSR from ω_0]',      min_value=-20., max_value=20.,  value=(-0., +6.),   step=0.1,   format='%f')
     pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
     # Build the interactive plots
-    modulus_fig, phase_fig, intensity_fig = interactive_plot(
+    modulus_fig, phase_fig, intensity_fig, mz_phase_fig = interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
         input_cross_coupling, 
@@ -153,7 +147,9 @@ def app():
         st.plotly_chart(modulus_fig, use_container_width=True)
     with st.expander(f'**Intensity enhancement @ pin {pin}**', expanded=False):
         st.plotly_chart(intensity_fig, use_container_width=True)
-    with st.expander(f'**Field phase @ pin {pin}**', expanded=True):
+    with st.expander(f'**Field phase difference in the Mach Zender**', expanded=True):
+        st.plotly_chart(mz_phase_fig, use_container_width=True)
+    with st.expander(f'**Field phase @ pin {pin}**', expanded=False):
         st.plotly_chart(phase_fig, use_container_width=True)
     diagram = 'img/tikz.png'
     with st.expander('**Structure diagram**', expanded=True):
