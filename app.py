@@ -2,9 +2,7 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-# from base import Pin, wavelength_to_frequency
-# from headless_snowman import HeadlessSnowman
-from src import Pin, wavelength_to_frequency, HeadlessSnowman
+from src import Pin, wavelength_to_frequency, HeadlessSnowman, HeadlessSnowmanInternalSource
 from scipy.constants import c
 
 # structure parameters
@@ -44,7 +42,7 @@ def interactive_plot(
     ): 
     angular_frequencies = np.linspace(omega_0 + n_res_left*omega_m, omega_0 + n_res_right*omega_m, number_of_points)
     # objects
-    Pin.reset_id_iterator()
+    # Pin.reset_id_iterator()
     standard_HS = HeadlessSnowman(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius,
@@ -59,8 +57,22 @@ def interactive_plot(
         central_wavelength=central_wavelength,
         angular_frequencies=angular_frequencies,
     )
-    Pin.reset_id_iterator()
+    # Pin.reset_id_iterator()
     new_HS = HeadlessSnowman(
+        main_radius = main_radius,
+        auxiliary_radius = auxiliary_radius_ratio * main_radius,
+        mach_zender_length = MZ_ratio * main_radius * np.pi,
+        input_cross_coupling_coefficient = new_main_cross_coupling,
+        through_cross_coupling_coefficient = new_trough_cross_coupling,
+        ring_cross_coupling_coefficient = new_auxiliary_cross_coupling,
+        effective_refractive_index = effective_index,
+        group_refractive_index = group_index,
+        GVD = GVD,
+        loss_dB = loss_dB,
+        central_wavelength = central_wavelength,
+        angular_frequencies = angular_frequencies,
+    )
+    internal_source_HS = HeadlessSnowmanInternalSource(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius_ratio * main_radius,
         mach_zender_length = MZ_ratio * main_radius * np.pi,
@@ -86,13 +98,6 @@ def interactive_plot(
     if log_scale:
         modulus_fig.update_layout(yaxis_type="log")
 
-    # field phase
-    phase_fig = go.Figure()
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(np.angle(reference_fields[:, pin])), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
-    phase_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.cos(np.angle(new_fields[:, pin])), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
-    phase_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='cos( Phase [rad] )', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
-    phase_fig.update_xaxes(range=[angular_frequencies[0], angular_frequencies[-1]])
-
     # MZ phase difference
     ref_delta_phi_mz = (np.angle(reference_fields[:, 4]) - np.angle(reference_fields[:, 2])) - (np.angle(reference_fields[:, 5]) - np.angle(reference_fields[:, 3]))
     new_delta_phi_mz = (np.angle(new_fields[:, 4]) - np.angle(new_fields[:, 2])) - (np.angle(new_fields[:, 5]) - np.angle(new_fields[:, 3]))
@@ -109,7 +114,7 @@ def interactive_plot(
     intensity_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Intensity enhancement', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
     if log_scale:
         intensity_fig.update_layout(yaxis_type="log")
-    return modulus_fig, phase_fig, intensity_fig, mz_phase_fig
+    return modulus_fig, intensity_fig, mz_phase_fig
 
 
 # Streamlit app
@@ -129,7 +134,7 @@ def app():
     pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
     # Build the interactive plots
-    modulus_fig, phase_fig, intensity_fig, mz_phase_fig = interactive_plot(
+    modulus_fig, intensity_fig, phase_fig = interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
         input_cross_coupling, 
@@ -147,9 +152,7 @@ def app():
         st.plotly_chart(modulus_fig, use_container_width=True)
     with st.expander(f'**Intensity enhancement @ pin {pin}**', expanded=False):
         st.plotly_chart(intensity_fig, use_container_width=True)
-    with st.expander(f'**Field phase difference in the Mach Zender**', expanded=True):
-        st.plotly_chart(mz_phase_fig, use_container_width=True)
-    with st.expander(f'**Field phase @ pin {pin}**', expanded=False):
+    with st.expander(f'**Cosine of the phase delay in the Mach Zender**', expanded=True):
         st.plotly_chart(phase_fig, use_container_width=True)
     diagram = 'img/tikz.png'
     with st.expander('**Structure diagram**', expanded=True):
