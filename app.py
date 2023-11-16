@@ -41,9 +41,9 @@ def interactive_plot(
         pin
     ): 
     angular_frequencies = np.linspace(omega_0 + n_res_left*omega_m, omega_0 + n_res_right*omega_m, number_of_points)
+    
     # objects
-    # Pin.reset_id_iterator()
-    standard_HS = HeadlessSnowman(
+    reference_HS = HeadlessSnowman(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius,
         mach_zender_length = mach_zender_length,
@@ -57,7 +57,6 @@ def interactive_plot(
         central_wavelength=central_wavelength,
         angular_frequencies=angular_frequencies,
     )
-    # Pin.reset_id_iterator()
     new_HS = HeadlessSnowman(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius_ratio * main_radius,
@@ -71,6 +70,20 @@ def interactive_plot(
         loss_dB = loss_dB,
         central_wavelength = central_wavelength,
         angular_frequencies = angular_frequencies,
+    )
+    reference_internal_source_HS = HeadlessSnowmanInternalSource(
+        main_radius = main_radius,
+        auxiliary_radius = auxiliary_radius,
+        mach_zender_length = mach_zender_length,
+        input_cross_coupling_coefficient=main_cross_coupling,
+        through_cross_coupling_coefficient=main_cross_coupling,
+        ring_cross_coupling_coefficient= 0, 
+        effective_refractive_index=effective_index,
+        group_refractive_index=group_index,
+        GVD=GVD,
+        loss_dB=loss_dB,
+        central_wavelength=central_wavelength,
+        angular_frequencies=angular_frequencies,
     )
     internal_source_HS = HeadlessSnowmanInternalSource(
         main_radius = main_radius,
@@ -89,7 +102,7 @@ def interactive_plot(
 
     # field modulus
     modulus_fig = go.Figure()
-    reference_fields = standard_HS.fields
+    reference_fields = reference_HS.fields
     new_fields = new_HS.fields
     modulus_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(reference_fields[:, pin]), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
     modulus_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(new_fields[:, pin]), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
@@ -114,7 +127,16 @@ def interactive_plot(
     intensity_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Intensity enhancement', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
     if log_scale:
         intensity_fig.update_layout(yaxis_type="log")
-    return modulus_fig, intensity_fig, mz_phase_fig
+
+    # field modulus with the internal source
+    internal_source_fig = go.Figure()
+    internal_source_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(reference_internal_source_HS.fields[:, pin]), mode='lines', name='reference', line=dict(color="#1f77b4", dash='dot', width=2)))
+    internal_source_fig.add_trace(go.Scatter(x=angular_frequencies, y=np.abs(internal_source_HS.fields[:, pin]), mode='lines', name=f'HS signal', line=dict(color="#ff7f0e",  width=2)))
+    internal_source_fig.update_layout(xaxis_title='Angular frequency [rad/s]', yaxis_title='Field enhancement', autosize=False, width=800, height=500, margin=dict(l=50, r=50, b=100, t=100, pad=4))
+    if log_scale:
+        internal_source_fig.update_layout(yaxis_type="log")
+
+    return modulus_fig, intensity_fig, mz_phase_fig, internal_source_fig
 
 
 # Streamlit app
@@ -134,7 +156,7 @@ def app():
     pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
 
     # Build the interactive plots
-    modulus_fig, intensity_fig, phase_fig = interactive_plot(
+    modulus_fig, intensity_fig, phase_fig, internal_source_fig = interactive_plot(
         MZ_ratio, 
         auxiliary_radius_ratio, 
         input_cross_coupling, 
@@ -154,10 +176,17 @@ def app():
         st.plotly_chart(intensity_fig, use_container_width=True)
     with st.expander(f'**Cosine of the phase delay in the Mach Zender**', expanded=True):
         st.plotly_chart(phase_fig, use_container_width=True)
+    with st.expander(f'**Internal Source: Field enhancement @ pin {pin}**', expanded=True):
+        st.plotly_chart(internal_source_fig, use_container_width=True)
     diagram = 'img/tikz.png'
     with st.expander('**Structure diagram**', expanded=True):
         cols = st.columns([1, 1, 1])
         cols[1].image(diagram, width=500)
+        diagram = 'img/tikz.png'
+    internal_source_diagram = 'img/internal_source.png'
+    with st.expander('**Structure diagram with the internal source**', expanded=False):
+        cols = st.columns([1, 1, 1])
+        cols[1].image(internal_source_diagram, width=500)
 
 
 # Run the app
