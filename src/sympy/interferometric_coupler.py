@@ -63,7 +63,7 @@ class SymPy_InterferometricCoupler:
     def pole_zero_plot(self, pin, m, n, k, cross_coupling_1, cross_coupling_2, unitary_loss_coefficient, fig=None, ax=None):
         if fig is None or ax is None:
             fig, ax = plt.subplots(figsize=(6, 6))
-        pole_zero_plot(self.transfer_function(pin, m, n, k, cross_coupling_1, cross_coupling_2, unitary_loss_coefficient), ax=ax, show=False)
+        pole_zero_plot(self.transfer_function(pin, m, n, k, cross_coupling_1, cross_coupling_2, unitary_loss_coefficient), ax=ax, show=False, pole_color='red', zero_color='green',)
         omega = np.linspace(0, 2*np.pi, 10000)
         # black
         ax.plot(np.cos(omega), np.sin(omega), color="black")
@@ -76,7 +76,7 @@ class SymPy_InterferometricCoupler:
         magnitude_response_lambda = self.numeric_solution_lambdified(pin, m, n, k, cross_coupling_1, cross_coupling_2, unitary_loss_coefficient)
         omega = np.linspace(0, 2*np.pi, 10000)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
-        ax.plot(omega, magnitude_response)
+        ax.plot(omega, magnitude_response, label=f'interferometric coupler')
         ax.set_title(f'Magnitude response')
         ax.set_xlabel(r"Normalized $\omega$ [rad/s]")
         ax.set_ylabel(f"$H_{pin}(\omega)$")
