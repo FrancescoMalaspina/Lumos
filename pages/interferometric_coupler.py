@@ -36,7 +36,7 @@ ring_params = {
     'l': m+n,
     'cross_coupling_1': cross_coupling_1,
     'unitary_loss_coefficient': unitary_loss_coefficient,
-    'pin': pin,
+    'pin': pin%4,
 }
 
 fig1, ax1 = plt.subplots(figsize = (6, 6))
