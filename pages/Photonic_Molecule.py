@@ -13,7 +13,7 @@ PM = SymPy_PhotonicMolecule()
 ring = SymPy_RingResonator()
 
 st.set_page_config(layout='wide')
-st.title('Interferometric Coupler (DCDR)')
+st.title('Photonic Molecule')
 
 pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7], index=1)
 # onluy integer values are allowed for m, n, k, min_value=1, step=1
@@ -47,7 +47,7 @@ ring.numeric_parameters = ring_params
 
 fig, ax = plt.subplots(1, 2, figsize = (20, 9))
 PM.pole_zero_plot(pin=1, ax=ax[0], fig=fig)
-PM.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='DCDR', omega=np.linspace(-np.pi, np.pi, 10000))
+PM.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='PM', omega=np.linspace(-np.pi, np.pi, 10000))
 ring.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, is_reference=True, omega=np.linspace(-np.pi, np.pi, 10000))
 # plt.show()
 

@@ -47,8 +47,8 @@ ring.numeric_parameters = ring_params
 
 fig, ax = plt.subplots(1, 2, figsize = (20, 9))
 IC.pole_zero_plot(pin=1, ax=ax[0], fig=fig)
-IC.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='DCDR')
-ring.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, is_reference=True)
+IC.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='DCDR', omega=np.linspace(0, 2*np.pi, 10000))
+ring.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, is_reference=True, omega=np.linspace(0, 2*np.pi, 10000))
 # plt.show()
 
 st.pyplot(fig)
