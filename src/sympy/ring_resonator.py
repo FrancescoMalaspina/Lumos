@@ -34,14 +34,21 @@ class SymPy_RingResonator(SymPy_PhotonicCircuit):
             Eq(a1, a3 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["l"]),
         ]
     
-    def magnitude_response_plot(self, pin, fig: Figure = None, ax: Axes = None, is_reference = False, label = None) -> Figure:
+    def magnitude_response_plot(
+            self, 
+            pin, 
+            fig: Figure = None, 
+            ax: Axes = None, 
+            is_reference = False, 
+            label = None, 
+            omega = np.linspace(-np.pi, np.pi, 10000)
+        ) -> Figure:
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
         if fig is None or ax is None:
             fig, ax = plt.subplots(figsize=(8, 6))
         magnitude_response_lambda = self.numeric_solution_lambdified(pin)
-        omega = np.linspace(0, 2*np.pi, 10000)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
         if is_reference:
             ax.plot(omega, magnitude_response, label=f'ring', linestyle='dotted')

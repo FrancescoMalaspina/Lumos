@@ -17,7 +17,7 @@ class SymPy_InterferometricCoupler(SymPy_PhotonicCircuit):
         return {
             "m": symbols("m"),
             "n": symbols("n"),
-            "k": symbols("k"),
+            "p": symbols("p"),
             "cross_coupling_1": symbols(r"\kappa_1"),
             "cross_coupling_2": symbols(r"\kappa_2"),
             "self_coupling_1": symbols(r"\sigma_1"),
@@ -37,5 +37,5 @@ class SymPy_InterferometricCoupler(SymPy_PhotonicCircuit):
             Eq(a7, I * self.parameter_symbols["cross_coupling_2"] * a4 + self.parameter_symbols["self_coupling_2"] * a5),
             Eq(a5, a3 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["n"]),
             Eq(a1, a7 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["m"]),
-            Eq(a4, a2 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["k"]),
+            Eq(a4, a2 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["p"]),
         ]
