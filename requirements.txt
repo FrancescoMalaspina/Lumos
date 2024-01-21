@@ -1,5 +1,4 @@
 numpy
 plotly
 scipy
-matplotlib
 sympy
