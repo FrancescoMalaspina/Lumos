@@ -51,5 +51,5 @@ magnitude_response_plot = PM.plotly_magnitude_response_plot(pin=pin, label='Phot
 magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
 
 col1, col2 = st.columns(2)
-col1.plotly_chart(pole_zero_plot)
-col2.plotly_chart(magnitude_response_plot)
+col1.plotly_chart(pole_zero_plot, use_container_width=False)
+col2.plotly_chart(magnitude_response_plot, use_container_width=True)
