@@ -2,8 +2,6 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from scipy.constants import c
-import matplotlib.pyplot as plt
 
 # local imports
 from src.sympy.interferometric_coupler import SymPy_InterferometricCoupler
