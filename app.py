@@ -141,8 +141,10 @@ def interactive_plot(
 
 # Streamlit app
 def app():
+    # Set page title
+    # st.set_page_config(page_title='Numerical Simulation')
     st.set_page_config(layout='wide')
-    st.title('Headless Snowman')
+    st.title('Resonant Interferometric Coupler (RIC)')
 
     # input widgets
     log_scale                   = st.sidebar.toggle('Log scale', value=False)
