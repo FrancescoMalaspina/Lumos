@@ -1,12 +1,13 @@
+# third party imports
+from sympy import symbols, Eq, I
+import numpy as np
+import plotly.graph_objects as go
+
+# local imports
 from src.sympy.base import SymPy_PhotonicCircuit
 
-from sympy import symbols, Eq, I, linsolve, together, lambdify
-from sympy.physics.control.lti import TransferFunction
-from sympy.physics.control.control_plots import pole_zero_plot
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.axes import Axes
+# type hinting
+from typing import Any
 
 class SymPy_RingResonator(SymPy_PhotonicCircuit):
     num_pins = 4
@@ -34,32 +35,37 @@ class SymPy_RingResonator(SymPy_PhotonicCircuit):
             Eq(a1, a3 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["l"]),
         ]
     
-    def magnitude_response_plot(
+    def plotly_magnitude_response_plot(
             self, 
-            pin, 
-            fig: Figure = None, 
-            ax: Axes = None, 
-            is_reference = False, 
-            label = None, 
-            omega = np.linspace(-np.pi, np.pi, 10000)
-        ) -> Figure:
+            pin: int, 
+            label: str = None, 
+            is_reference: bool = False,
+            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2*np.pi, 10000),
+            fig: go.Figure = go.Figure(),
+    ) -> go.Figure:
+        
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(figsize=(8, 6))
+        
+        # plot
         magnitude_response_lambda = self.numeric_solution_lambdified(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
+
         if is_reference:
-            ax.plot(omega, magnitude_response, label=f'ring', linestyle='dotted')
-        else: 
+            fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name='ring', line=dict(dash='dash')))
+        else:
             if label is None:
-                ax.plot(omega, magnitude_response)
+                fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines'))
             else:
-                ax.plot(omega, magnitude_response, label=label)
-        ax.set_title(f'Magnitude response')
-        ax.set_xlabel(r"Normalized $\omega$ [rad/s]")
-        ax.set_ylabel(f"$H_{pin}(\omega)$")
-        ax.grid("True")
-        ax.legend()
+                fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name=label))
+
+        # set layout
+        fig.update_layout(
+            title='Magnitude response',
+            xaxis_title="Normalized ω [rad/s]",
+            yaxis_title=f"H_{pin}(ω)",
+            margin=dict(l=50, r=50, b=100, t=100, pad=4),
+        )
+
         return fig

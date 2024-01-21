@@ -2,8 +2,6 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from scipy.constants import c
-import matplotlib.pyplot as plt
 
 # local imports
 from src.sympy.resonant_interferometric_coupler import SymPy_ResonantInterferometricCoupler
@@ -52,10 +50,13 @@ ring_params = {
 RIC.numeric_parameters = ric_params
 ring.numeric_parameters = ring_params
 
-fig, ax = plt.subplots(1, 2, figsize = (20, 9))
-RIC.pole_zero_plot(pin=1, ax=ax[0], fig=fig)
-RIC.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='RIC', omega=np.linspace(-np.pi, np.pi, 10000))
-ring.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, is_reference=True, omega=np.linspace(-np.pi, np.pi, 10000))
-# plt.show()
+pole_zero_plot = go.Figure()
+pole_zero_plot = RIC.plotly_pole_zero_plot(pin = pin, fig = pole_zero_plot)
 
-st.pyplot(fig)
+magnitude_response_plot = go.Figure()
+magnitude_response_plot = RIC.plotly_magnitude_response_plot(pin=pin, label='Resonant Interferometric Coupler', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot)
+magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
+
+col1, col2 = st.columns(2)
+col1.plotly_chart(pole_zero_plot, use_container_width=False)
+col2.plotly_chart(magnitude_response_plot, use_container_width=True)

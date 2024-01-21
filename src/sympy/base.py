@@ -1,17 +1,18 @@
+# third party imports
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import os
 import pickle
 from abc import ABC, abstractmethod
 
+# local imports
 from sympy import symbols, Eq, I, linsolve, together, lambdify
-from sympy.physics.control.lti import TransferFunction
 from src.sympy.utils import pole_zero_plot
 from src.config import SYMPY_DATA_PATH
 
-from matplotlib.figure import Figure
-from matplotlib.axes import Axes
+# type hinting
 from sympy.core.expr import Expr
+from sympy.physics.control.lti import TransferFunction
 from typing import Any
 
 class SymPy_PhotonicCircuit(ABC):
@@ -123,59 +124,67 @@ class SymPy_PhotonicCircuit(ABC):
             raise ValueError("Numeric parameters must be set before calling transfer_function")
         return TransferFunction.from_rational_expression(self.numeric_solution(pin), self.z)
     
-    def pole_zero_plot(
-            self, 
-            pin, 
-            fig: Figure = None, 
-            ax: Axes = None
-    ) -> Figure:
-        
+    def plotly_pole_zero_plot(
+            self,
+            pin: int,
+            fig: go.Figure = go.Figure(),
+    ) -> go.Figure:
+            
         # check if numeric parameters are set
         if not self.numeric_parameters:
-            raise ValueError("Numeric parameters must be set before calling pole_zero_plot")
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(figsize=(6, 6))
+            raise ValueError("Numeric parameters must be set before calling plotly_pole_zero_plot")
         
         # plot
-        pole_zero_plot(self.transfer_function(pin), fig=fig, ax=ax, show=False)
         omega = np.linspace(0, 2*np.pi, 5000)
-        ax.plot(np.cos(omega), np.sin(omega), color="black")
-        ax.set_title(f'Pole-zero plot')
+        pole_zero_plot(self.transfer_function(pin), fig=fig, show=False)
+        fig.add_trace(go.Scatter(x=np.cos(omega), y=np.sin(omega), mode='lines', name='unit circle', line=dict(color='black')))
+        
+        # set layout
+        fig.update_layout(
+            title = 'Pole-zero plot',
+            xaxis_title = "Real Axis",
+            yaxis_title = "Imaginary Axis",
+            autosize = False,
+            width = 900,
+            height = 900,
+            margin = dict(l=50, r=50, b=100, t=100, pad=4),
+        )
+        
         return fig
     
-    def magnitude_response_plot(
+    def plotly_magnitude_response_plot(
             self, 
             pin: int, 
-            fig: Figure = None, 
-            ax: Axes = None, 
             label: str = None, 
-            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2*np.pi, 10000)
-    ) -> Figure:
+            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2*np.pi, 10000),
+            fig: go.Figure = go.Figure(),
+    ) -> go.Figure:
         
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
         
-        # set matplotlib environment
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(figsize=(8, 6))
-
         # plot
         magnitude_response_lambda = self.numeric_solution_lambdified(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
-        if label is None:
-            ax.plot(omega, magnitude_response)
-            # ax.legend("False")
-        else:
-            ax.plot(omega, magnitude_response, label=label)
-            # ax.legend("True")
-        ax.set_title(f'Magnitude response')
-        ax.set_xlabel(r"Normalized $\omega$ [rad/s]")
-        ax.set_ylabel(f"$H_{pin}(\omega)$")
-        ax.grid("True")
-        ax.legend()
+
+        # add trace
+        fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name=label))
+
+        # set layout
+        fig.update_layout(
+            title='Magnitude response',
+            xaxis_title="Normalized ω [rad/s]",
+            yaxis_title=f"H_{pin}(ω)",
+            autosize=False,
+            width=1200,
+            height=900,
+            margin=dict(l=50, r=50, b=100, t=100, pad=4),
+        )
+
         return fig
     
+
     def magnitude_response_data(
             self,
             pin: int,
