@@ -53,7 +53,7 @@ class SymPy_RingResonator(SymPy_PhotonicCircuit):
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
 
         if is_reference:
-            fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name='ring', line=dict(dash='dash')))
+            fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name='Reference Ring Resonator', line=dict(dash='dash')))
         else:
             if label is None:
                 fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines'))
