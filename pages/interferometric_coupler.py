@@ -16,13 +16,13 @@ st.set_page_config(layout='wide')
 st.title('Interferometric Coupler (DCDR)')
 
 pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7], index=1)
-# onluy integer values are allowed for m, n, k, min_value=1, step=1
-m = st.sidebar.number_input('m', value=1, min_value=1, step=1)
-n = st.sidebar.number_input('n', value=3, min_value=1, step=1)
-p = st.sidebar.number_input('p', value=4, min_value=1, step=1)
-cross_coupling_1 = st.sidebar.number_input('cross_coupling_1', value=0.5, min_value=0., max_value=1., step=0.01)
-cross_coupling_2 = st.sidebar.number_input('cross_coupling_2', value=0.48, min_value=0., max_value=1., step=0.01)
-unitary_loss_coefficient = st.sidebar.number_input('unitary_loss_coefficient', value=0.999, min_value=0., max_value=1.,  format='%.3f')
+# only integer values are allowed for m, n, k, min_value=1, step=1
+m = st.sidebar.number_input('$m$', value=1, min_value=1, step=1)
+n = st.sidebar.number_input('$n$', value=3, min_value=1, step=1)
+p = st.sidebar.number_input('$p$', value=4, min_value=1, step=1)
+cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.5, min_value=0., max_value=1., step=0.01)
+cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.48, min_value=0., max_value=1., step=0.01)
+unitary_loss_coefficient = st.sidebar.number_input(r'$\gamma$', value=0.999, min_value=0., max_value=1.,  format='%.3f')
 
 ic_params = {
     'm': m,
@@ -45,10 +45,13 @@ ring_params = {
 IC.numeric_parameters = ic_params
 ring.numeric_parameters = ring_params
 
-fig, ax = plt.subplots(1, 2, figsize = (20, 9))
-IC.pole_zero_plot(pin=1, ax=ax[0], fig=fig)
-IC.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, label='DCDR', omega=np.linspace(0, 2*np.pi, 10000))
-ring.magnitude_response_plot(pin=pin, ax=ax[1], fig=fig, is_reference=True, omega=np.linspace(0, 2*np.pi, 10000))
-# plt.show()
+pole_zero_plot = go.Figure()
+pole_zero_plot = IC.plotly_pole_zero_plot(pin = pin, fig = pole_zero_plot)
 
-st.pyplot(fig)
+magnitude_response_plot = go.Figure()
+magnitude_response_plot = IC.plotly_magnitude_response_plot(pin=pin, label='DCDR', omega=np.linspace(0, 2*np.pi, 10000), fig=magnitude_response_plot)
+magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(0, 2*np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
+
+col1, col2 = st.columns(2)
+col1.plotly_chart(pole_zero_plot)
+col2.plotly_chart(magnitude_response_plot)

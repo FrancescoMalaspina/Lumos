@@ -17,13 +17,13 @@ pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7], index=1)
 # onluy integer values are allowed for m, n, k, min_value=1, step=1
 m_1 = st.sidebar.number_input('$m_1$', value=2, min_value=1, step=1)
 m_2 = st.sidebar.number_input('$m_2$', value=2, min_value=1, step=1)
-n_1 = st.sidebar.number_input('n_1', value=1, min_value=1, step=1)
-n_2 = st.sidebar.number_input('n_2', value=1, min_value=1, step=1)
-p = st.sidebar.number_input('p', value=3, min_value=1, step=1)
-cross_coupling_1 = st.sidebar.number_input('cross_coupling_1', value=0.2, min_value=0., max_value=1., step=0.01)
-cross_coupling_2 = st.sidebar.number_input('cross_coupling_2', value=0.2, min_value=0., max_value=1., step=0.01)
-cross_coupling_a = st.sidebar.number_input('cross_coupling_a', value=0.4, min_value=0., max_value=1., step=0.01)
-unitary_loss_coefficient = st.sidebar.number_input('unitary_loss_coefficient', value=0.999, min_value=0., max_value=1.,  format='%.3f')
+n_1 = st.sidebar.number_input('$n_1$', value=1, min_value=1, step=1)
+n_2 = st.sidebar.number_input('$n_2$', value=1, min_value=1, step=1)
+p = st.sidebar.number_input('$p$', value=3, min_value=1, step=1)
+cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.2, min_value=0., max_value=1., step=0.01)
+cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.2, min_value=0., max_value=1., step=0.01)
+cross_coupling_a = st.sidebar.number_input(r'$\kappa_a$', value=0.4, min_value=0., max_value=1., step=0.01)
+unitary_loss_coefficient = st.sidebar.number_input(r'$\gamma$', value=0.999, min_value=0., max_value=1.,  format='%.3f')
 
 ric_params = {
     'm_1': m_1,
@@ -32,8 +32,8 @@ ric_params = {
     'n_2': n_2,
     'p': p,
     'cross_coupling_1': cross_coupling_1,
-    "cross_coupling_2": cross_coupling_2,
-    "cross_coupling_a": cross_coupling_a,
+    'cross_coupling_2': cross_coupling_2,
+    'cross_coupling_a': cross_coupling_a,
     'self_coupling_1': np.sqrt(1 - cross_coupling_1**2),
     'self_coupling_2': np.sqrt(1 - cross_coupling_2**2),
     'self_coupling_a': np.sqrt(1 - cross_coupling_a**2),
