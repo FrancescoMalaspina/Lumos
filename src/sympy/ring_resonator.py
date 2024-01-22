@@ -49,7 +49,7 @@ class SymPy_RingResonator(SymPy_PhotonicCircuit):
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
         
         # plot
-        magnitude_response_lambda = self.numeric_solution_lambdified(pin)
+        magnitude_response_lambda = self.numeric_lambda_solution(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
 
         if is_reference:
