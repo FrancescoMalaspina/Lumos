@@ -5,6 +5,9 @@ import os
 import pickle
 from abc import ABC, abstractmethod
 
+from numpy import ndarray, dtype, floating
+from numpy._typing import _64Bit
+
 # local imports
 from sympy import symbols, Eq, I, linsolve, together, lambdify
 from src.sympy.utils import pole_zero_plot
@@ -13,7 +16,8 @@ from src.config import SYMPY_DATA_PATH
 # type hinting
 from sympy.core.expr import Expr
 from sympy.physics.control.lti import TransferFunction
-from typing import Any
+from typing import Any, Tuple
+
 
 class SymPy_PhotonicCircuit(ABC):
     num_pins = 1
@@ -60,7 +64,7 @@ class SymPy_PhotonicCircuit(ABC):
         
         Returns:
             list[Expr]: A list of sympy expressions representing the solutions of the system of equations.
-        """       
+        """
         directory = SYMPY_DATA_PATH
         filename = os.path.join(directory, f'{self.__class__.__name__}.pkl')
         solutions = list()
@@ -77,9 +81,9 @@ class SymPy_PhotonicCircuit(ABC):
                 pickle.dump(solutions, f)
             # print(f"Saving {filename}")
         return solutions
-    
+
     def solution(
-            self, 
+            self,
             pin
     ) -> Expr:
         """
@@ -92,80 +96,81 @@ class SymPy_PhotonicCircuit(ABC):
             Expr: The solution for the given pin.
         """
         return self.solutions[pin]
-    
+
     def numeric_solution(
-            self, 
+            self,
             pin
     ) -> Expr:
-        
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
-            raise ValueError("Numeric parameters must be set before calling numeric_solution")       
-        subtitution_table = {self.parameter_symbols[k]: v for k, v in self.numeric_parameters.items()}
-        return self.solution(pin).subs(subtitution_table)
-    
-    def numeric_solution_lambdified(
-            self, 
+            raise ValueError("Numeric parameters must be set before calling numeric_solution")
+        substitution_table = {self.parameter_symbols[k]: v for k, v in self.numeric_parameters.items()}
+        return self.solution(pin).subs(substitution_table)
+
+    def numeric_lambda_solution(
+            self,
             pin
     ) -> Any:
-        
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling numeric_solution_lambdified")
         return lambdify(self.z, self.numeric_solution(pin))
-    
+
     def transfer_function(
-            self, 
+            self,
             pin
     ) -> TransferFunction:
-        
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling transfer_function")
         return TransferFunction.from_rational_expression(self.numeric_solution(pin), self.z)
-    
+
     def plotly_pole_zero_plot(
             self,
             pin: int,
             fig: go.Figure = go.Figure(),
     ) -> go.Figure:
-            
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling plotly_pole_zero_plot")
-        
+
         # plot
-        omega = np.linspace(0, 2*np.pi, 5000)
+        omega = np.linspace(0, 2 * np.pi, 5000)
         pole_zero_plot(self.transfer_function(pin), fig=fig, show=False)
-        fig.add_trace(go.Scatter(x=np.cos(omega), y=np.sin(omega), mode='lines', name='unit circle', line=dict(color='black')))
-        
+        fig.add_trace(
+            go.Scatter(x=np.cos(omega), y=np.sin(omega), mode='lines', name='unit circle', line=dict(color='black')))
+
         # set layout
         fig.update_layout(
-            title = 'Pole-zero plot',
-            xaxis_title = "Real Axis",
-            yaxis_title = "Imaginary Axis",
-            autosize = False,
-            width = 900,
-            height = 900,
-            margin = dict(l=50, r=50, b=100, t=100, pad=4),
+            title='Pole-zero plot',
+            xaxis_title="Real Axis",
+            yaxis_title="Imaginary Axis",
+            autosize=False,
+            width=900,
+            height=900,
+            margin=dict(l=50, r=50, b=100, t=100, pad=4),
         )
-        
+
         return fig
-    
+
     def plotly_magnitude_response_plot(
-            self, 
-            pin: int, 
-            label: str = None, 
-            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2*np.pi, 10000),
+            self,
+            pin: int,
+            label: str = None,
+            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2 * np.pi, 10000),
             fig: go.Figure = go.Figure(),
     ) -> go.Figure:
-        
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
-        
+
         # plot
-        magnitude_response_lambda = self.numeric_solution_lambdified(pin)
+        magnitude_response_lambda = self.numeric_lambda_solution(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
 
         # add trace
@@ -183,13 +188,12 @@ class SymPy_PhotonicCircuit(ABC):
         )
 
         return fig
-    
 
     def magnitude_response_data(
             self,
             pin: int,
-            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2*np.pi, 10000)
-    ) -> np.ndarray[Any, np.dtype[np.float64]]:
+            omega: np.ndarray[Any, np.dtype[np.float64]] = np.linspace(0, 2 * np.pi, 10000)
+    ) -> tuple[ndarray[Any, dtype[floating[_64Bit]]], Any]:
         """
         Returns the magnitude response data for a given pin.
         
@@ -201,18 +205,17 @@ class SymPy_PhotonicCircuit(ABC):
             np.ndarray[Any, np.dtype[np.float64]]: The angular frequency vector.
             np.ndarray[Any, np.dtype[np.float64]]: The magnitude response vector.
             """
-        
+
         # check if numeric parameters are set
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling magnitude_response_data")
 
-        magnitude_response_lambda = self.numeric_solution_lambdified(pin)
+        magnitude_response_lambda = self.numeric_lambda_solution(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
         return omega, magnitude_response
 
-    
     def __str__(self):
         return f"{self.__class__.__name__} object"
-    
+
     def __repr__(self):
         return f"{self.__class__.__name__} object"

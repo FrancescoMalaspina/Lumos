@@ -1,5 +1,5 @@
-from .base import CompositeStructure, Pin, wavelength_to_frequency
-from .structures import AddDropFilter, Waveguide, RingResonator, Source, AddDropFilterInternalSource
+from src.base import CompositeStructure, Pin, wavelength_to_frequency
+from src.structures import AddDropFilter, Waveguide, RingResonator, Source, AddDropFilterInternalSource
 from collections.abc import Sequence
 import numpy as np
 from scipy.constants import c
