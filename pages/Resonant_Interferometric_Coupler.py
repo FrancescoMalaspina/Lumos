@@ -69,11 +69,17 @@ if pin <4:
 magnitude_response_plot.update_layout(
 legend=dict(
     orientation="h",
-    yanchor="bottom",
-    y=1.02,
-    xanchor="right",
-    x=1
+    # yanchor="bottom",
+    # y=1.02,
+    # xanchor="right",
+    # x=1
 ))
+
+pole_zero_plot.update_layout(
+    legend = dict(
+        orientation='h'
+    )
+)
 
 col1, col2 = st.columns(2)
 col1.plotly_chart(pole_zero_plot, use_container_width=True)
