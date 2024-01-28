@@ -49,11 +49,11 @@ class SymPy_RingResonator(SymPy_PhotonicCircuit):
             raise ValueError("Numeric parameters must be set before calling magnitude_response_plot")
         
         # plot
-        magnitude_response_lambda = self.numeric_solution_lambdified(pin)
+        magnitude_response_lambda = self.numeric_lambda_solution(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
 
         if is_reference:
-            fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name='ring', line=dict(dash='dash')))
+            fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines', name='Reference Ring Resonator', line=dict(dash='dash')))
         else:
             if label is None:
                 fig.add_trace(go.Scatter(x=omega, y=magnitude_response, mode='lines'))

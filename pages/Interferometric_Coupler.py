@@ -2,8 +2,6 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from scipy.constants import c
-import matplotlib.pyplot as plt
 
 # local imports
 from src.sympy.interferometric_coupler import SymPy_InterferometricCoupler
@@ -53,5 +51,5 @@ magnitude_response_plot = IC.plotly_magnitude_response_plot(pin=pin, label='DCDR
 magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(0, 2*np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
 
 col1, col2 = st.columns(2)
-col1.plotly_chart(pole_zero_plot)
-col2.plotly_chart(magnitude_response_plot)
+col1.plotly_chart(pole_zero_plot, use_container_width=False)
+col2.plotly_chart(magnitude_response_plot, use_container_width=True)

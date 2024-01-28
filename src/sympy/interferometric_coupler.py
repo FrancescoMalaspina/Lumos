@@ -1,10 +1,6 @@
 from src.sympy.base import SymPy_PhotonicCircuit
 
-from sympy import symbols, Eq, I, linsolve, together, lambdify
-from sympy.physics.control.lti import TransferFunction
-from src.sympy.utils import pole_zero_plot
-import numpy as np
-import matplotlib.pyplot as plt
+from sympy import symbols, Eq, I
 
 class SymPy_InterferometricCoupler(SymPy_PhotonicCircuit):
     num_pins = 8

@@ -2,7 +2,7 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from src import Pin, wavelength_to_frequency, HeadlessSnowman, HeadlessSnowmanInternalSource
+from src import wavelength_to_frequency, HeadlessSnowman, HeadlessSnowmanInternalSource
 from scipy.constants import c
 
 # structure parameters

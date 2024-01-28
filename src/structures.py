@@ -1,4 +1,4 @@
-from .base import BaseStructure, CompositeStructure, Pin, wavelength_to_frequency
+from src.base import BaseStructure, CompositeStructure, Pin, wavelength_to_frequency
 from collections.abc import Sequence
 import numpy as np
 from scipy.constants import c
