@@ -69,15 +69,19 @@ if pin <4:
 magnitude_response_plot.update_layout(
 legend=dict(
     orientation="h",
-    # yanchor="bottom",
-    # y=1.02,
-    # xanchor="right",
-    # x=1
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1
 ))
 
 pole_zero_plot.update_layout(
     legend = dict(
-        orientation='h'
+        orientation='h',
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
     )
 )
 
