@@ -13,7 +13,7 @@ ring = SymPy_RingResonator()
 st.set_page_config(layout='wide')
 st.title('Resonant Interferometric Coupler (RIC)')
 
-pin = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7], index=1)
+pin = st.sidebar.selectbox('Pin', [i for i in range(12)], index=1)
 # onluy integer values are allowed for m, n, k, min_value=1, step=1
 m_1 = st.sidebar.number_input('$m_1$', value=2, min_value=1, step=1)
 m_2 = st.sidebar.number_input('$m_2$', value=2, min_value=1, step=1)
