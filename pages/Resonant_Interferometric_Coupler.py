@@ -55,7 +55,8 @@ pole_zero_plot = RIC.plotly_pole_zero_plot(pin = pin, fig = pole_zero_plot)
 
 magnitude_response_plot = go.Figure()
 magnitude_response_plot = RIC.plotly_magnitude_response_plot(pin=pin, label='Resonant Interferometric Coupler', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot)
-magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
+if pin <4:
+    magnitude_response_plot = ring.plotly_magnitude_response_plot(pin=pin, label='Reference Ring Resonator', omega=np.linspace(-np.pi, np.pi, 10000), fig=magnitude_response_plot, is_reference=True)
 
 col1, col2 = st.columns(2)
 col1.plotly_chart(pole_zero_plot, use_container_width=False)
