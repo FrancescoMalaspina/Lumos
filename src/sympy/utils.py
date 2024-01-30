@@ -1,6 +1,7 @@
 # third party imports
 import plotly.graph_objects as go
 import numpy as np
+from scipy.signal import find_peaks
 
 # local imports
 from sympy.physics.control.control_plots import pole_zero_numerical_data
@@ -79,3 +80,21 @@ def pole_zero_plot(
         return
 
     return fig
+
+def peak_height(magnitude_response):
+    peaks, _ = find_peaks(magnitude_response)
+    peak_heights = magnitude_response[peaks]
+    return peak_heights[0]
+
+def compute_fwhm(peak_index, peak_heigth, x_data, y_data):
+    fwhm = []
+    left_idx = peak_index
+    while left_idx > 0 and y_data[left_idx] > peak_heigth / 2:
+        left_idx -= 1
+    right_idx = peak_index
+    while right_idx < len(y_data) - 1 and y_data[right_idx] > peak_heigth / 2:
+        right_idx += 1
+    left_x = np.interp(peak_heigth/2, [y_data[left_idx], y_data[left_idx+1]], [x_data[left_idx], x_data[left_idx+1]])
+    right_x = np.interp(peak_heigth/2, [y_data[right_idx], y_data[right_idx-1]], [x_data[right_idx], x_data[right_idx-1]])
+    fwhm = right_x - left_x
+    return fwhm

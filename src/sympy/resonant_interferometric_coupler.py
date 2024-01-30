@@ -54,6 +54,7 @@ class SymPy_TwoHeaded_ResonantInterferometricCoupler(SymPy_PhotonicCircuit):
     @property
     def parameter_symbols(self):
         return {
+            **super().parameter_symbols,
             "m_1": symbols("m_1"),
             "m_2": symbols("m_2"),
             "n_1": symbols("n_1"),
@@ -69,7 +70,6 @@ class SymPy_TwoHeaded_ResonantInterferometricCoupler(SymPy_PhotonicCircuit):
             "self_coupling_2": symbols(r"\sigma_2"),
             "self_coupling_a": symbols(r"\sigma_a"),
             "self_coupling_b": symbols(r"\sigma_b"),
-            "unitary_loss_coefficient": symbols(r"\gamma"),
         }
     
     @property

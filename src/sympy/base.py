@@ -4,20 +4,19 @@ import plotly.graph_objects as go
 import os
 import pickle
 from abc import ABC, abstractmethod
-
-from numpy import ndarray, dtype, floating
-from numpy._typing import _64Bit
+from scipy.signal import find_peaks
 
 # local imports
-from sympy import symbols, Eq, I, linsolve, together, lambdify
-from src.sympy.utils import pole_zero_plot
+from sympy import symbols, linsolve, together, lambdify
+from src.sympy.utils import pole_zero_plot, compute_fwhm
 from src.config import SYMPY_DATA_PATH
 
 # type hinting
 from sympy.core.expr import Expr
 from sympy.physics.control.lti import TransferFunction
 from typing import Any, Tuple
-
+from numpy import ndarray, dtype, floating
+from numpy._typing import _64Bit
 
 class SymPy_PhotonicCircuit(ABC):
     num_pins = 1
@@ -32,7 +31,7 @@ class SymPy_PhotonicCircuit(ABC):
     @property
     @abstractmethod
     def parameter_symbols(self) -> dict:
-        pass
+        return {"unitary_loss_coefficient": symbols(r"\gamma")}
 
     @property
     def numeric_parameters(self) -> dict:
@@ -213,7 +212,31 @@ class SymPy_PhotonicCircuit(ABC):
         magnitude_response_lambda = self.numeric_lambda_solution(pin)
         magnitude_response = np.abs(magnitude_response_lambda(np.exp(1j * omega)))
         return omega, magnitude_response
+    
+    @property
+    def _intrinsic_fwhm(self) -> float:
+        """
+        Returns the intrinsic FWHM of the magnitude response of the first pin.
+        """
+        if not self.numeric_parameters:
+            raise ValueError("Numeric parameters must be set before calling intrinsic_fwhm")
+        gamma = self.numeric_parameters[self.parameter_symbols["unitary_loss_coefficient"]]
+        return 2 * (1 - gamma)
+    
+    @property
+    def main_extraction_efficiency(self) -> float:
+        """
+        Returns the extraction efficiency of the main resonance.
+        """
+        omega, magnitude_response = self.magnitude_response_data(1)
+        peak_indices, _ = find_peaks(magnitude_response)
+        peak_index = min(peak_indices, key=lambda x: np.abs(omega[x] - np.pi))
+        peak_heigth = magnitude_response[peak_index]    
+        peak_fwhm = compute_fwhm(peak_index, peak_heigth, omega, magnitude_response)
 
+        return peak_fwhm / self._intrinsic_fwhm
+
+    
     def __str__(self):
         return f"{self.__class__.__name__} object"
 
