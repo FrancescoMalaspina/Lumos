@@ -84,6 +84,8 @@ class SymPy_TwoHeaded_ResonantInterferometricCoupler(SymPy_PhotonicCircuit):
             Eq(a7, I * self.parameter_symbols["cross_coupling_2"] * a4 + self.parameter_symbols["self_coupling_2"] * a5),
             Eq(a10, self.parameter_symbols["self_coupling_a"] * a8 + I * self.parameter_symbols["cross_coupling_a"] * a9),
             Eq(a11, I * self.parameter_symbols["cross_coupling_a"] * a8 + self.parameter_symbols["self_coupling_a"] * a9),
+            Eq(a14, self.parameter_symbols["self_coupling_b"] * a12 + I * self.parameter_symbols["cross_coupling_b"] * a13),
+            Eq(a15, I * self.parameter_symbols["cross_coupling_b"] * a12 + self.parameter_symbols["self_coupling_b"] * a13),
             Eq(a5, a3 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["m_2"]),
             Eq(a1, a7 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["m_1"]),
             Eq(a4,  a14 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["n_3"]),
