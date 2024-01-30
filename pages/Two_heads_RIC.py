@@ -93,6 +93,10 @@ pole_zero_plot.update_layout(
     )
 )
 
+
+extraction_efficiency = RIC.main_extraction_efficiency
+st.metric(label='Main extraction efficiency', value=f'{extraction_efficiency*100:.1f} %', delta=f'{extraction_efficiency*100 - 95:.1f} %')
+
 col1, col2 = st.columns(2)
 col1.plotly_chart(pole_zero_plot, use_container_width=True)
 col2.plotly_chart(magnitude_response_plot, use_container_width=True)

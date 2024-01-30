@@ -220,7 +220,7 @@ class SymPy_PhotonicCircuit(ABC):
         """
         if not self.numeric_parameters:
             raise ValueError("Numeric parameters must be set before calling intrinsic_fwhm")
-        gamma = self.numeric_parameters[self.parameter_symbols["unitary_loss_coefficient"]]
+        gamma = self.numeric_parameters["unitary_loss_coefficient"]
         return 2 * (1 - gamma)
     
     @property
@@ -234,7 +234,7 @@ class SymPy_PhotonicCircuit(ABC):
         peak_heigth = magnitude_response[peak_index]    
         peak_fwhm = compute_fwhm(peak_index, peak_heigth, omega, magnitude_response)
 
-        return peak_fwhm / self._intrinsic_fwhm
+        return 1 - self._intrinsic_fwhm / peak_fwhm
 
     
     def __str__(self):
