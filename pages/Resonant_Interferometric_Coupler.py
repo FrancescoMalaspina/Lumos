@@ -20,9 +20,9 @@ m_2 = st.sidebar.number_input('$m_2$', value=2, min_value=1, step=1)
 n_1 = st.sidebar.number_input('$n_1$', value=1, min_value=1, step=1)
 n_2 = st.sidebar.number_input('$n_2$', value=1, min_value=1, step=1)
 p = st.sidebar.number_input('$p$', value=3, min_value=1, step=1)
-cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.2, min_value=0., max_value=1., step=0.01)
-cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.2, min_value=0., max_value=1., step=0.01)
-cross_coupling_a = st.sidebar.number_input(r'$\kappa_a$', value=0.4, min_value=0., max_value=1., step=0.01)
+cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.6, min_value=0., max_value=1., step=0.01)
+cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.4, min_value=0., max_value=1., step=0.01)
+cross_coupling_a = st.sidebar.number_input(r'$\kappa_a$', value=0.9, min_value=0., max_value=1., step=0.01)
 unitary_loss_coefficient = st.sidebar.number_input(r'$\gamma$', value=0.999, min_value=0., max_value=1.,  format='%.3f')
 
 ric_params = {
