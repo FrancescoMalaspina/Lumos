@@ -22,10 +22,10 @@ n_2 = st.sidebar.number_input('$n_2$', value=1, min_value=1, step=1)
 n_3 = st.sidebar.number_input('$n_3$', value=1, min_value=1, step=1)
 p_1 = st.sidebar.number_input('$p_1$', value=3, min_value=1, step=1)
 p_2 = st.sidebar.number_input('$p_2$', value=2, min_value=1, step=1)
-cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.6, min_value=0., max_value=1., step=0.01)
+cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.45, min_value=0., max_value=1., step=0.01)
 cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.4, min_value=0., max_value=1., step=0.01)
-cross_coupling_a = st.sidebar.number_input(r'$\kappa_a$', value=0.9, min_value=0., max_value=1., step=0.01)
-cross_coupling_b = st.sidebar.number_input(r'$\kappa_b$', value=0.9, min_value=0., max_value=1., step=0.01)
+cross_coupling_a = st.sidebar.number_input(r'$\kappa_a$', value=0.7, min_value=0., max_value=1., step=0.01)
+cross_coupling_b = st.sidebar.number_input(r'$\kappa_b$', value=0.7, min_value=0., max_value=1., step=0.01)
 unitary_loss_coefficient = st.sidebar.number_input(r'$\gamma$', value=0.9999, min_value=0., max_value=1.,  format='%.4f')
 
 ric_params = {
@@ -56,7 +56,13 @@ ring_params = {
 
 RIC.numeric_parameters = ric_params
 ring.numeric_parameters = ring_params
-omega = np.linspace(0, 2 * np.pi, 20000)
+# omega = np.linspace(0, 2 * np.pi, 10000)
+omega = np.sort(np.concatenate((
+    np.linspace(0, 2 * np.pi, 5000), 
+    np.linspace(np.pi - 0.01, np.pi + 0.01, 5000),
+    np.linspace(np.pi - np.pi/3 - 0.01, np.pi - np.pi/3 + 0.01, 5000), 
+    np.linspace(np.pi + np.pi/3 - 0.01, np.pi + np.pi/3 + 0.01, 5000)
+    )))
 
 pole_zero_plot = go.Figure()
 pole_zero_plot = RIC.plotly_pole_zero_plot(pin = pin, fig = pole_zero_plot)

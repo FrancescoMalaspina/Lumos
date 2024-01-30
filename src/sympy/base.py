@@ -229,10 +229,11 @@ class SymPy_PhotonicCircuit(ABC):
         Returns the extraction efficiency of the main resonance.
         """
         omega, magnitude_response = self.magnitude_response_data(1)
-        peak_indices, _ = find_peaks(magnitude_response)
+        intensity_response = np.square(magnitude_response)
+        peak_indices, _ = find_peaks(intensity_response)
         peak_index = min(peak_indices, key=lambda x: np.abs(omega[x] - np.pi))
-        peak_heigth = magnitude_response[peak_index]    
-        peak_fwhm = compute_fwhm(peak_index, peak_heigth, omega, magnitude_response)
+        peak_heigth = intensity_response[peak_index]    
+        peak_fwhm = compute_fwhm(peak_index, peak_heigth, omega, intensity_response)
 
         return 1 - self._intrinsic_fwhm / peak_fwhm
 
