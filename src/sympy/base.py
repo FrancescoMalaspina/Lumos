@@ -14,7 +14,7 @@ from src.config import SYMPY_DATA_PATH
 # type hinting
 from sympy.core.expr import Expr
 from sympy.physics.control.lti import TransferFunction
-from typing import Any, Tuple
+from typing import Any
 from numpy import ndarray, dtype, floating
 from numpy._typing import _64Bit
 

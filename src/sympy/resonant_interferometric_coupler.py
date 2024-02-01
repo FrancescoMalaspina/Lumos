@@ -94,3 +94,11 @@ class SymPy_TwoHeaded_ResonantInterferometricCoupler(SymPy_PhotonicCircuit):
             Eq(a9,  a11 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["p_1"]),
             Eq(a13, a15 * (self.parameter_symbols["unitary_loss_coefficient"] * z ** (-1)) ** self.parameter_symbols["p_2"]),
         ]
+    
+    @property
+    def _intrinsic_fwhm(self):
+        if not self.numeric_parameters:
+            raise ValueError("Numeric parameters must be set before calling intrinsic_fwhm")
+        gamma = self.numeric_parameters["unitary_loss_coefficient"]
+        m = self.numeric_parameters["m_1"] + self.numeric_parameters["m_2"]
+        return 2 * (1 - gamma ** m)
