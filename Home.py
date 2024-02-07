@@ -38,6 +38,7 @@ def interactive_plot(
         log_scale, 
         n_res_left, 
         n_res_right, 
+        number_of_points,
         pin
     ): 
     angular_frequencies = np.linspace(omega_0 + n_res_left*omega_m, omega_0 + n_res_right*omega_m, number_of_points)
@@ -156,6 +157,7 @@ def app():
     auxiliary_cross_coupling    = st.sidebar.number_input('Auxiliary cross coupling (κ_8)',     min_value=0.,   max_value=1.,   value=0.5,          step=0.05,  format='%.2f')
     n_res_left, n_res_right     = st.sidebar.slider('X axis range [FSR from ω_0]',      min_value=-20., max_value=20.,  value=(-0., +6.),   step=0.1,   format='%f')
     pin                         = st.sidebar.selectbox('Pin', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], index=1)
+    number_of_points            = st.sidebar.number_input('Number of points', min_value=1000, max_value=50000, value=5000, step=1000, format='%d')
 
     # Build the interactive plots
     modulus_fig, intensity_fig, phase_fig, internal_source_fig = interactive_plot(
@@ -167,6 +169,7 @@ def app():
         log_scale, 
         n_res_left, 
         n_res_right, 
+        number_of_points,
         pin
     )
 
