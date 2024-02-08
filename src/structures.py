@@ -50,6 +50,39 @@ class Waveguide(BaseStructure):
     def __str__(self):
         """ Return a string representation of the object. """
         return f"Waveguide {self.id}"
+    
+
+class Waveguide_withPhaseDelay(Waveguide):
+    num_pins = 2
+    num_equations = 1
+
+    def __init__(
+            self,
+            length: float = 0,
+            effective_refractive_index: float = 1,
+            group_refractive_index: float = 1,
+            GVD: float = 0,
+            loss_dB: float = 10,  # dB/m
+            central_wavelength: float = 1550e-9,
+            angular_frequencies: Sequence[float] = [wavelength_to_frequency(1550e-9)],
+            phase_delay: float = 0,
+            pins: Sequence[Pin] = None
+    ):
+        super().__init__(length, effective_refractive_index, group_refractive_index, GVD, loss_dB, central_wavelength, angular_frequencies, pins)
+        self.phase_delay = phase_delay
+
+    @property
+    def field_equations(self):
+        loss_amplitude_coefficient = np.exp(-self.loss_dB * np.log(10) / 20 * self.length)
+        equations = [{
+            self.pins[0]: -loss_amplitude_coefficient * np.exp(1j * (self.wavevector * self.length + self.phase_delay)),
+            self.pins[1]: 1,
+        }]
+        return equations
+
+    def __str__(self):
+        """ Return a string representation of the object. """
+        return f"Waveguide {self.id}"
 
 
 # TODO: refactor the Source class, input fields in more than one pin: input of a vector of amplitudes, phases, and pins
