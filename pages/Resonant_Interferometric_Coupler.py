@@ -4,10 +4,10 @@ import numpy as np
 import plotly.graph_objects as go
 
 # local imports
-from src.sympy.resonant_interferometric_coupler import SymPy_ResonantInterferometricCoupler
+from src.sympy.resonant_interferometric_coupler import SymPy_ResonantInterferometricCoupler_withAdditionalMZIphase
 from src.sympy.ring_resonator import SymPy_RingResonator
 
-RIC = SymPy_ResonantInterferometricCoupler()
+RIC = SymPy_ResonantInterferometricCoupler_withAdditionalMZIphase()
 ring = SymPy_RingResonator()
 
 st.set_page_config(layout='wide')
@@ -19,6 +19,7 @@ m_1 = st.sidebar.number_input('$m_1$', value=2, min_value=1, step=1)
 m_2 = st.sidebar.number_input('$m_2$', value=2, min_value=1, step=1)
 n_1 = st.sidebar.number_input('$n_1$', value=1, min_value=1, step=1)
 n_2 = st.sidebar.number_input('$n_2$', value=1, min_value=1, step=1)
+phi_over_pi = st.sidebar.number_input(r'$\phi$/\pi', value=0.5, min_value=0., max_value=2, step=0.01)
 p = st.sidebar.number_input('$p$', value=3, min_value=1, step=1)
 cross_coupling_1 = st.sidebar.number_input(r'$\kappa_1$', value=0.6, min_value=0., max_value=1., step=0.01)
 cross_coupling_2 = st.sidebar.number_input(r'$\kappa_2$', value=0.4, min_value=0., max_value=1., step=0.01)
@@ -30,6 +31,7 @@ ric_params = {
     'm_2': m_2,
     'n_1': n_1,
     'n_2': n_2,
+    'additional_MZI_phase': phi_over_pi * np.pi, # convert to 'rad
     'p': p,
     'cross_coupling_1': cross_coupling_1,
     'cross_coupling_2': cross_coupling_2,
