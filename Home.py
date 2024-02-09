@@ -2,7 +2,7 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from src import wavelength_to_frequency, HeadlessSnowman, HeadlessSnowmanInternalSource, HeadlessSnowman_withPhaseDelay
+from src import wavelength_to_frequency, HeadlessSnowman, HeadlessSnowmanInternalSource
 from scipy.constants import c
 
 # structure parameters
@@ -59,7 +59,7 @@ def interactive_plot(
         central_wavelength=central_wavelength,
         angular_frequencies=angular_frequencies,
     )
-    new_HS = HeadlessSnowman_withPhaseDelay(
+    new_HS = HeadlessSnowman(
         main_radius = main_radius,
         auxiliary_radius = auxiliary_radius_ratio * main_radius,
         mach_zender_length = MZ_ratio * main_radius * np.pi,
@@ -72,7 +72,7 @@ def interactive_plot(
         loss_dB = loss_dB,
         central_wavelength = central_wavelength,
         angular_frequencies = angular_frequencies,
-        phase_delay = new_phase_delay
+        MZI_phase_delay = new_phase_delay
     )
     reference_internal_source_HS = HeadlessSnowmanInternalSource(
         main_radius = main_radius,
@@ -95,6 +95,7 @@ def interactive_plot(
         input_cross_coupling_coefficient = new_main_cross_coupling,
         through_cross_coupling_coefficient = new_trough_cross_coupling,
         ring_cross_coupling_coefficient = new_auxiliary_cross_coupling,
+        MZI_phase_delay=new_phase_delay,
         effective_refractive_index = effective_index,
         group_refractive_index = group_index,
         GVD = GVD,
