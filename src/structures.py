@@ -50,7 +50,7 @@ class Waveguide(BaseStructure):
     def __str__(self):
         """ Return a string representation of the object. """
         return f"Waveguide {self.id}"
-    
+
 
 class Waveguide_withPhaseDelay(Waveguide):
     num_pins = 2
@@ -148,29 +148,6 @@ class WaveguideSource(Waveguide):
 
 
 class DirectionalCoupler(BaseStructure):
-    """
-        Field Equations:
-        The field equations for the point coupler are:
-        ```
-        \begin{bmatrix}
-        \sigma & 1j\kappa & 1 & 0 \\
-        1j\kappa & \sigma & 0 & 1
-        \end{bmatrix}
-        \begin{bmatrix}
-        A_0 \\
-        A_1 \\
-        A_2 \\
-        A_3
-        \end{bmatrix}
-        =
-        \begin{bmatrix}
-        0 \\
-        0
-        \end{bmatrix}
-        ```
-        where `A_0`, `A_1`, `A_2`, and `A_3` are the complex amplitudes of the fields at the four pins of the point coupler,
-        and `sigma` and `kappa` are the self-coupling and cross-coupling coefficients of the point coupler, respectively.
-        """
     num_pins = 4
     num_equations = 2
 
